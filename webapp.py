@@ -63,6 +63,15 @@ def handle_message(message):
         a.digital_write(PIN, 0)
 
 
+@socketio.on('temperature input', namespace='/carpi')
+def handle_slider(message):
+    print(message.get('value'))
+
+
+@socketio.on('pressure input', namespace='/carpi')
+def handle_slider(message):
+    print(message.get('value'))
+
 
 if __name__ == '__main__':
     print("startin application")

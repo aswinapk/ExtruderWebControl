@@ -2,7 +2,8 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>LEE Gauge Test</title>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
     <script src="static/gauge.min.js"></script>
     <script type="text/javascript" src="static/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="static/socket.io-1.3.5.min.js"></script>
@@ -31,11 +32,18 @@
       $('#powBtn').on('click', function() {
         socket.emit('power button press',{checkbox:$('#powBtn').is(':checked')});
       });
+
+      $('#tempRange').on('input', function() {
+        socket.emit('temperature input', {value: $(this).val()});
+      });
+
+      $('#presRange').on('input', function() {
+        socket.emit('pressure input', {value: $(this).val()});
+      });
     });
 
     var video = document.querySelector("#videoElement");
     if (navigator.mediaDevices.getUserMedia) {
-    print("hi);
     navigator.mediaDevices.getUserMedia({ video: true })
     .then(function (stream) {
       video.srcObject = stream;
@@ -44,6 +52,7 @@
       console.log("Something went wrong!");
     });
     }
+
     </script>
     <style>.switch {
   position: relative;
@@ -129,15 +138,35 @@ input:checked + .slider:after
 <body style="background: #666">
 
 <p>DAKE Extruder Control Panel: <b>Sysytems Integration Lab</b></p>
-<h3>Power Button</h3>
-<!-- Rounded switch -->
-<label class="switch">
-       <input type="checkbox" id="powBtn" name="powerBtn">
-       <div class="slider round">
-           <span class="on"></span>
-           <span class="off"></span>
-       </div>
-   </label>
+<section id="first">
+    <div align="center">
+        <div style="float:left">
+            <h3>Power Button</h3>
+            <!-- Rounded switch -->
+            <label class="switch">
+                <input type="checkbox" id="powBtn" name="powerBtn">
+                <div class="slider round">
+                    <span class="on"></span>
+                    <span class="off"></span>
+                </div>
+            </label>
+        </div>
+
+        <div style="float:center">
+            <h3>Piston Button</h3>
+            <!-- Rounded switch -->
+            <label class="switch">
+                <input type="checkbox" id="pistnBtn" name="pistnrBtn">
+                <div class="slider round">
+                    <span class="on"></span>
+                    <span class="off"></span>
+                </div>
+            </label>
+        </div>
+    </div>
+</section>
+<h3></h3>
+<section id="Second">
 <div align="center">
     <div style="float: left">
         <h3>Heater Temperature</h3>
@@ -177,7 +206,7 @@ input:checked + .slider:after
       extGauge.draw();
     </script>
     </div>
-    <div style="float: left">
+    <div style="float: left;margin-left:50px">
         <h3>Input Air Pressure</h3>
         <!-- Pressure sensor -->
         <canvas id="frontroom-temp">  </canvas>
@@ -223,10 +252,20 @@ input:checked + .slider:after
     </div>
 </div>
 
-<h3>Front View Video stream</h3>
-<div style="float: left" id="container">
-	<video autoplay="true" id="videoElement"></video>
+<div style="float: left;margin-left:250px;margin-bottom:150px" id="container">
+	<video autoplay="true" id="videoElement">
+    </video>
+    <h3 style="margin-left:100px">Front View</h3>
 </div>
+
+</section>
+<h3>Temperature input slider</h3>
+
+<section style="float:left">
+<input type="range" min="1" max="100" value="50" id="tempRange">
+<h3>Pressure input slider</h3>
+<input type="range" min="1" max="100" value="50" id="presRange">
+</section>
 
 </body>
 </html>
