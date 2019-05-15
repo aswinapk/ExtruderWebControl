@@ -13,45 +13,39 @@
       var testc = 10;
       $(document).ready(function() {
       namespace = '/carpi';
-          var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-          socket.on('connect', function() {
-               socket.emit('my_event', {data: 'I\'m connected!'});
-          });
-          socket.on('my_response', function(msg) {
-              $('#values').html(msg.count)
-      $('#log').append('<br>' + $('<div/>').text('Received #' + msg.data + ': ' + msg.count).html())
-      var heaterTemp = msg.heaterTemp
-      var frontroom = msg.fr
-      var kitchen = msg.kt
-      var bedroom = msg.bd
-      extGauge.value = heaterTemp
-      frontroomGauge.value = frontroom
-      kitchenGauge.value = kitchen
-      bedroomGauge.value = bedroom
-            });
+      var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+      console.log(socket);
+      socket.on('connect', function(){
+        socket.emit('my_event', {data: 'I\'m connected!'});
+      });
+      socket.on('my_response', function(msg){
+        $('#values').html(msg.count)
+        $('#log').append('<br>' + $('<div/>').text('Received #' + msg.data + ': ' + msg.count).html())
+        var heaterTemp = msg.heaterTemp
+        var inputPressure = msg.inPressure
+        extGauge.value = heaterTemp
+        frontroomGauge.value = inputPressure
+      });
+
       $('#powBtn').on('click', function() {
         socket.emit('power button press',{checkbox:$('#powBtn').is(':checked')});
       });
 
+      $('#pistnBtn').on('click', function() {
+        socket.emit('pressure button press',{checkbox:$('#pistnBtn').is(':checked')});
+      });
+
       $('#tempRange').on('input', function() {
+         console.log($(this).val());
         socket.emit('temperature input', {value: $(this).val()});
       });
 
       $('#presRange').on('input', function() {
+
         socket.emit('pressure input', {value: $(this).val()});
       });
-    });
 
-    var video = document.querySelector("#videoElement");
-    if (navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: true })
-    .then(function (stream) {
-      video.srcObject = stream;
-    })
-    .catch(function (err0r) {
-      console.log("Something went wrong!");
-    });
-    }
+      });
 
     </script>
     <style>.switch {
@@ -133,6 +127,47 @@ input:checked + .slider:after
 	height: 175px;
 	background-color: #666;
 }
+
+.slidecontainer {
+  width: 100%; /* Width of the outside container */
+}
+
+/* The sliderbar */
+.sliderbar {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 15px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+/* Mouse-over effects */
+.sliderbar:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+.sliderbar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  border-radius: 50%;
+  height: 15px;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.sliderbar::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
 </style>
 </head>
 <body style="background: #666">
@@ -175,8 +210,8 @@ input:checked + .slider:after
         <script>
       var extGauge = new RadialGauge({
       renderTo: 'external-temp',
-      width: 100,
-      height: 100,
+      width: 150,
+      height: 150,
       units: "Deg",
       minValue: 0,
       maxValue: 800,
@@ -213,8 +248,8 @@ input:checked + .slider:after
         <script>
       var frontroomGauge = new RadialGauge({
       renderTo: 'frontroom-temp',
-      width: 100,
-      height: 100,
+      width: 150,
+      height: 150,
       units: "Deg",
       minValue: 0,
       maxValue: 160,
@@ -251,20 +286,27 @@ input:checked + .slider:after
     </script>
     </div>
 </div>
+    <div style="float:center;margin:100px">
+        <img src="http://169.254.255.253/nphMotionJpeg?Resolution=640x480&Quality=Standard" height="380" width="480" border="5">
+    </div>
+    <div style="float:right;margin-left:0px">
+        <img src="http://169.254.255.253/nphMotionJpeg?Resolution=640x480&Quality=Standard" height="380" width="480" border="5">
+    </div>
 
+<!--
 <div style="float: left;margin-left:250px;margin-bottom:150px" id="container">
 	<video autoplay="true" id="videoElement">
     </video>
     <h3 style="margin-left:100px">Front View</h3>
 </div>
-
+-->
 </section>
 <h3>Temperature input slider</h3>
 
 <section style="float:left">
-<input type="range" min="1" max="100" value="50" id="tempRange">
+<input type="range" min="1" max="800" value="400" id="tempRange" class="sliderbar">
 <h3>Pressure input slider</h3>
-<input type="range" min="1" max="100" value="50" id="presRange">
+<input type="range" min="1" max="160" value="80" id="presRange" class="sliderbar">
 </section>
 
 </body>
