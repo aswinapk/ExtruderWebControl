@@ -36,12 +36,14 @@
       });
 
       $('#tempRange').on('input', function() {
-         console.log($(this).val());
+        var output = document.getElementById("tempVal");
+        output.innerHTML = $(this).val();
         socket.emit('temperature input', {value: $(this).val()});
       });
 
       $('#presRange').on('input', function() {
-
+        var output = document.getElementById("presVal");
+        output.innerHTML = $(this).val();
         socket.emit('pressure input', {value: $(this).val()});
       });
 
@@ -97,7 +99,6 @@ input:checked + .slider:before {
   transform: translateX(55px);
 }
 
-/*------ ADDED CSS ---------*/
 .slider:after
 {
  content:'OFF';
@@ -116,23 +117,10 @@ input:checked + .slider:after
   content:'ON';
 }
 
-#container {
-	margin: 0px auto;
-	width: 300px;
-	height: 175px;
-	border: 10px #333 solid;
-}
-#videoElement {
-	width: 300px;
-	height: 175px;
-	background-color: #666;
-}
-
 .slidecontainer {
-  width: 100%; /* Width of the outside container */
+  width: 100%;
 }
 
-/* The sliderbar */
 .sliderbar {
   -webkit-appearance: none;
   appearance: none;
@@ -148,7 +136,7 @@ input:checked + .slider:after
 
 /* Mouse-over effects */
 .sliderbar:hover {
-  opacity: 1; /* Fully shown on mouse-over */
+  opacity: 1;
 }
 
 .sliderbar::-webkit-slider-thumb {
@@ -172,12 +160,11 @@ input:checked + .slider:after
 </head>
 <body style="background: #666">
 
-<p>DAKE Extruder Control Panel: <b>Sysytems Integration Lab</b></p>
-<section id="first">
-    <div align="center">
-        <div style="float:left">
+<section id="button and top view">
+    <div >
+        <p>DAKE Extruder Control Panel: <b>Sysytems Integration Lab</b></p>
+        <div style="float:left;margin-left:70px">
             <h3>Power Button</h3>
-            <!-- Rounded switch -->
             <label class="switch">
                 <input type="checkbox" id="powBtn" name="powerBtn">
                 <div class="slider round">
@@ -186,10 +173,8 @@ input:checked + .slider:after
                 </div>
             </label>
         </div>
-
-        <div style="float:center">
+        <div style="float:left;margin-left:150px">
             <h3>Piston Button</h3>
-            <!-- Rounded switch -->
             <label class="switch">
                 <input type="checkbox" id="pistnBtn" name="pistnrBtn">
                 <div class="slider round">
@@ -198,12 +183,15 @@ input:checked + .slider:after
                 </div>
             </label>
         </div>
+        <div style="float:center;margin-left:800px">
+         <p>Front View</p>
+        <img src="http://128.194.119.77/mjpeg.cgi" height="220" width="320" border="5">
+    </div>
     </div>
 </section>
-<h3></h3>
-<section id="Second">
-<div align="center">
-    <div style="float: left">
+
+<section id="gauges">
+    <div style="float: left;margin-left:40px">
         <h3>Heater Temperature</h3>
         <!-- Heater temp -->
         <canvas id="external-temp">  </canvas>
@@ -241,7 +229,7 @@ input:checked + .slider:after
       extGauge.draw();
     </script>
     </div>
-    <div style="float: left;margin-left:50px">
+    <div style="float: left;margin-left:100px">
         <h3>Input Air Pressure</h3>
         <!-- Pressure sensor -->
         <canvas id="frontroom-temp">  </canvas>
@@ -285,29 +273,26 @@ input:checked + .slider:after
       frontroomGauge.draw();
     </script>
     </div>
-</div>
-    <div style="float:center;margin:100px">
-        <img src="http://169.254.255.253/nphMotionJpeg?Resolution=640x480&Quality=Standard" height="380" width="480" border="5">
-    </div>
-    <div style="float:right;margin-left:0px">
-        <img src="http://169.254.255.253/nphMotionJpeg?Resolution=640x480&Quality=Standard" height="380" width="480" border="5">
-    </div>
-
-<!--
-<div style="float: left;margin-left:250px;margin-bottom:150px" id="container">
-	<video autoplay="true" id="videoElement">
-    </video>
-    <h3 style="margin-left:100px">Front View</h3>
-</div>
--->
-</section>
-<h3>Temperature input slider</h3>
-
-<section style="float:left">
-<input type="range" min="1" max="800" value="400" id="tempRange" class="sliderbar">
-<h3>Pressure input slider</h3>
-<input type="range" min="1" max="160" value="80" id="presRange" class="sliderbar">
 </section>
 
+<section id="top view">
+    <div style="float:center;margin-left:800px">
+        <p>Top View</p>
+        <img src="http://128.194.119.253/nphMotionJpeg?Resolution=640x480&Quality=Standard" height="220" width="320" border="5">
+    </div>
+</section>
+
+<section id = "sliders">
+    <div style="float:left;margin-left:10px">
+        <h3>Temperature input slider</h3>
+        <input type="range" min="1" max="800" value="400" id="tempRange" class="sliderbar">
+        <p>Value: <span id="tempVal">400</span></p>
+    </div>
+    <div style="float:left;margin-left:80px;">
+        <h3>Pressure input slider</h3>
+        <input type="range" min="1" max="160" value="80" id="presRange" class="sliderbar">
+        <p>Value: <span id="presVal">80</span></p>
+    </div>
+</section>
 </body>
 </html>
