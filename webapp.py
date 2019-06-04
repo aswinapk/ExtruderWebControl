@@ -1,7 +1,5 @@
-# !/usr/bin/env python
 import json
 import time
-
 import math
 from flask import Flask, render_template,request
 from flask_socketio import SocketIO, emit
@@ -16,9 +14,9 @@ socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 global a
 
+# temperature_offset = 20 # to correct temperature off-set
 A0 = 0
 A1 = 1
-# A2 = 2
 Power_PIN = 13
 Pressure_OUT = 12
 Temperature_OUT = 3
@@ -26,17 +24,15 @@ Temperature_OUT = 3
 
 
 def background_thread():
-    """Example of how to send server generated events to clients."""
+    """send server generated events to clients."""
     while True:
         socketio.sleep(2)
         heaterTemp = a.analog_read(A0)
-        # print(heaterTemp)
-        # heaterTemp = get_actual_temperatuer(heaterTemp)
+        heaterTemp = get_actual_temperatuer(heaterTemp)
         data = get_data()
         temperature_in = data['temperature']
-        pressure_in = data['pressure']
         # print(heaterTemp,temp)
-        set_heater_temperature(heaterTemp,100)
+        set_heater_temperature(heaterTemp,temperature_in)
         pressure = a.analog_read(A1)
         pressure = get_actual_pressure(pressure)
         # print(pressure)
@@ -45,7 +41,7 @@ def background_thread():
                       namespace='/carpi')
 
 
-mesg = 'we are here...'
+mesg = 'Start...'
 
 
 @app.route('/')
@@ -87,13 +83,10 @@ def handle_temperature_slider(message):
 
 
 def get_actual_temperatuer(x):
-    # print("Temp_sensor_analog_reading:  ", x)
-    if x>335:
-        y=0
-    else:
-        y = 394474.6 - 3895.867 * x + 12.83176 * x ** 2 - 0.01407962 * x ** 3
-    # print("Temperature_Guage_output: ",y)
-    return y
+    y = x * 0.004882
+    y = (y - 1.25)/0.005  # temperature in celsius is got
+    y = y * (9/5) + 32  # get temperature in fahrenheit
+    return y - temperature_offset
 
 
 def get_actual_pressure(x):
@@ -105,7 +98,7 @@ def get_actual_pressure(x):
 
 
 def set_heater_temperature(heater_temperature,temp_thresh):
-    if(heater_temperature>temp_thresh+5):
+    if(heater_temperature>temp_thresh):
         a.digital_write(Temperature_OUT,0)
     else:
         a.digital_write(Temperature_OUT,1)
@@ -119,7 +112,7 @@ def handle_pressureslider(message):
     with open("persist", "w") as f1:
         json.dump(data, f1)
     pressure = 0.004607 * pressure **2 + 1.715 * pressure + -1.033
-    print(pressure)
+    # print(pressure)
     a.analog_write(Pressure_OUT,pressure)
     time.sleep(1)
 
@@ -139,3 +132,4 @@ if __name__ == '__main__':
     a.set_pin_mode(Pressure_OUT, 'O')
     time.sleep(1)
     socketio.run(app, host='0.0.0.0',debug=False)
+
